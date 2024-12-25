@@ -6,6 +6,8 @@ In this project, will demonstrate how to create a simple ETL(Extract, Transform,
 ### Problem Statement:
 We need to use Spotify’s API to read the data and perform some basic transformations and Data Quality checks finally will load the retrieved data to sqlite db/PostgreSQL DB and then automate the entire process through airflow. 
 
+![flow chart](![alt text](image.png))
+
 ##### Tech Stack / Skill used:
 - Python
 - API’s
