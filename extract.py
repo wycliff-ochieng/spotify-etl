@@ -7,19 +7,24 @@ import pandas as pd
 import urllib.parse
 from dotenv import load_dotenv
 import base64
+import sqlite3
 from requests import post,get
 from transform import check_if_data_is_valid
+import sqlalchemy
+from sqlalchemy import create_engine
 
 load_dotenv()
 
 client_id = os.getenv('CLIENT_ID')
 client_secret = os.getenv('CLIENT_SECRET')
 
+DATABASE_LOCATION = "sqlite:///most_recents.sqlite"
+
 code = 'AQBZAm0Pgo8ti8e5KqEPmE46seG3FLXo5alJQuWTkk9Djhh-_trjjLk1RdkhwweWJgp2gKgnNMCauLSQDLY7siC1q_Z0XeH6Rp0gPjJ25MRc89hOMpY0U28kJ7w-r6Zr98GkaxkSlKS1lCSzuEQ2obO5Igekwb-aZPROjSOl2nvlR8dATp8HMO8_ICpg7BYO5vC0JRpi11y-0K-rkCiCzchNmUnM6g'
 
 USER_ID = 'wyckie ochieng'
 
-ACCESS_TOKEN = 'BQDE6ygqn35O-icPDs4mY5rZODM1JXeHKTa4nQ3RBYfwcRQns9os4W9zD3RvuiiIvyEa0Fg27noZhGi4JI1qCh1WKXY2B0n8YPs2oYP68q0iLkwZ9o0VZh_M9kTnM4P7eava8nrcraTC8_UNTzCycLSxxaNWjkiGZ-pa0ka1Abm2v1qwU8QwxiFCmswgtTtq_-VnVD5cvcrThu2vCSQ'
+ACCESS_TOKEN = 'BQC306150ZOKykTNfx5rWPQli_zjZkZ73oLXt62gLar_CjunwqHqlBfDBOQcQlR8fA9DkMfg0JQlCxBAqzNS2w13dgiw4LAn0beI0YVPC00PQsYgwuwWIVsrpPq093R9GAWmVI4QAJp7J4wUdqPwhF6zHlRNXhGL02uyEdSOuBb9OfqR5kIIzEi9t5z6JpIYNYy83uo4qDf7v0OdqIQ'
 
 if __name__=="__main__":
 
@@ -63,4 +68,27 @@ if __name__=="__main__":
     print(song_df)
 
     check_if_data_is_valid(song_df)
+
+    engine = sqlalchemy.create_engine(DATABASE_LOCATION)
+    conn = sqlite3.connect("my_songs.sqlite")
+    cursor = conn.cursor()
+
+    sql_query = """
+    CREATE TABLE IF NOT EXISTS most_recents(
+        song_id TEXT,
+        songs_names VARCHAR(30),
+        artist_names VARCHAR(30),
+        played_at VARCHAR(50),
+        timestamps TIMESTAMP
+    )
+    """
+
+    cursor.execute(sql_query)
+    try:
+        song_df.to_sql("most_recents",engine,index="False",if_exists="append")
+    except:
+        print("Data already exists in the storage system")
+
+    conn.close()
+    print("Data laoded and database successfully closed")
 
